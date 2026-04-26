@@ -365,6 +365,25 @@ def test_scheduler_get_conflict_summary_reports_conflicts_with_details() -> None
 	assert "Morning feed" in summary
 
 
+def test_scheduler_generate_plan_report_includes_reasoning_and_remaining_time() -> None:
+	owner = Owner(name="Alex", available_hours=1)
+	dog = Pet(name="Buddy", species="dog", age=3)
+	dog.add_task(Task(description="Water bowl refresh", time_minutes=5, frequency="daily"))
+	dog.add_task(Task(description="Evening walk", time_minutes=20, frequency="daily"))
+	owner.add_pet(dog)
+	scheduler = Scheduler(owner)
+
+	report = scheduler.generate_plan_report(max_minutes=25)
+
+	assert report["total_minutes"] == 25
+	assert report["remaining_minutes"] == 0
+	assert len(report["plan"]) == 2
+	assert len(report["report_rows"]) == 2
+	assert report["report_rows"][0]["pet"] == "Buddy"
+	assert "priority=" in report["report_rows"][0]["reason"]
+	assert "quick win" in report["report_rows"][0]["reason"]
+
+
 def test_scheduler_ignores_default_00_00_start_time_in_conflicts() -> None:
 	owner = Owner(name="Alex", available_hours=3)
 	pet = Pet(name="Mochi", species="dog", age=3)

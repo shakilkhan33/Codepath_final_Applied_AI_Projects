@@ -197,6 +197,7 @@ st.divider()
 
 st.subheader("Build Schedule")
 max_plan_minutes = st.number_input("Max minutes to schedule", min_value=1, max_value=24 * 60, value=90, step=5)
+show_assistant_log = st.checkbox("Show assistant log", value=True)
 st.caption(
     "Schedule strategy: quick wins (short tasks), fairness across pets, then best-fit fill within your time budget."
 )
@@ -208,6 +209,7 @@ if st.button("Generate schedule"):
         st.warning("Schedule generated with existing time conflicts in pending tasks.")
         st.code(scheduler.get_conflict_summary())
 
+    report = scheduler.generate_plan_report(max_minutes=int(max_plan_minutes))
     organized_tasks = scheduler.organize_tasks(include_completed=False)
     if not organized_tasks:
         st.warning("No pending tasks to schedule.")
@@ -215,9 +217,19 @@ if st.button("Generate schedule"):
         st.markdown("### Organized Tasks")
         st.table(_task_table_rows(scheduler, organized_tasks))
 
-        plan = scheduler.generate_plan(max_minutes=int(max_plan_minutes))
+        plan = report["plan"]
         st.markdown("### Today's Plan")
         st.table(_task_table_rows(scheduler, plan))
 
-        total_minutes = sum(task.time_minutes for task in plan)
+        total_minutes = int(report["total_minutes"])
         st.caption(f"Total scheduled time: {total_minutes} minutes")
+
+        if show_assistant_log and report["report_rows"]:
+            st.markdown("### Assistant Log")
+            st.dataframe(report["report_rows"], use_container_width=True, hide_index=True)
+
+        st.info(
+            f"Remaining unscheduled time: {int(report['remaining_minutes'])} minutes"
+            if report["remaining_minutes"]
+            else "No remaining time in the current schedule window."
+        )

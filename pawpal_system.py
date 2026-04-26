@@ -423,6 +423,54 @@ class Scheduler:
 					total_minutes += task.time_minutes
 		return plan
 
+	def _get_pet_name_for_task(self, task: Task) -> str:
+		"""Return the owning pet name for a task when it can be resolved."""
+		for pet in self.owner.pets:
+			if task in pet.tasks:
+				return pet.name
+		return "Unknown"
+
+	def generate_plan_report(self, max_minutes: int | None = None) -> dict[str, object]:
+		"""Build a plan plus human-readable reasoning for each scheduled task."""
+		plan = self.generate_plan(max_minutes=max_minutes)
+		report_rows: list[dict[str, str | int]] = []
+		total_minutes = 0
+		for index, task in enumerate(plan, start=1):
+			pet_name = self._get_pet_name_for_task(task)
+			reason_bits = [
+				f"selected #{index}",
+				f"pet={pet_name}",
+				f"priority={self._task_priority_score(task):.1f}",
+				f"duration={task.time_minutes}m",
+			]
+			if task.time_minutes <= 10:
+				reason_bits.append("quick win")
+			if task.frequency.strip().lower() in {"daily", "twice daily"}:
+				reason_bits.append("recurring care")
+			report_rows.append(
+				{
+					"position": index,
+					"pet": pet_name,
+					"description": task.description,
+					"time_minutes": task.time_minutes,
+					"frequency": task.frequency,
+					"reason": "; ".join(reason_bits),
+				}
+			)
+			total_minutes += task.time_minutes
+
+		effective_limit = int(self.owner.available_hours * 60) if max_minutes is None else min(
+			int(self.owner.available_hours * 60),
+			max_minutes,
+		)
+		remaining_minutes = max(effective_limit - total_minutes, 0)
+		return {
+			"plan": plan,
+			"report_rows": report_rows,
+			"total_minutes": total_minutes,
+			"remaining_minutes": remaining_minutes,
+		}
+
 	def _add_to_plan(self, plan: list[Task], selected: set[int], task: Task) -> None:
 		"""Add task to plan and mark as selected to avoid duplicates."""
 		plan.append(task)

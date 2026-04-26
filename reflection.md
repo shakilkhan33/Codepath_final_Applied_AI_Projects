@@ -1,5 +1,33 @@
 # PawPal+ Project Reflection
 
+## System Diagram (Short)
+
+This diagram shows the main components, end-to-end data flow, and where human/testing checks validate results.
+
+```mermaid
+flowchart LR
+    H[Human User] --> UI[Streamlit UI app.py]
+    UI --> O[Owner and Pet Models]
+    O --> T[Task Objects]
+    T --> S[Scheduler Engine]
+    S --> P[Plan and Assistant Log]
+    P --> UI
+    UI --> H
+
+    S --> C[Conflict Detection and Validation]
+    C --> UI
+
+    X[Pytest Tester test_pawpal.py] --> CORE[pawpal_system.py Core Logic]
+    CORE --> X
+    H -. reviews schedule quality .-> UI
+    H -. adjusts tasks, hours, priorities .-> UI
+```
+
+Component mapping:
+- Main components: `Streamlit UI`, `Owner/Pet/Task models`, `Scheduler`, `Conflict detection`, `Pytest tester`.
+- Data flow: user input -> model/task creation -> scheduler processing -> plan output and assistant log -> user review.
+- Human/testing checkpoints: user reviews and edits schedule decisions in the UI; automated tests verify scheduler behavior and regressions.
+
 ## 1. System Design
 
 **a. Initial design**
@@ -177,9 +205,9 @@ These tests were important because my app is mostly logic-based. If one logic pa
 - How confident are you that your scheduler works correctly?
 - What edge cases would you test next if you had more time?
 
-I am confident at a good level because I ran `pytest` many times and the main workflows passed. I also checked both normal cases and failure cases.
+I am moderately confident in the scheduler because `pytest` covers the main workflows: task creation, completion, recurring rollover, sorting, filtering, conflict detection, and plan generation. I also did a human check by reviewing the generated plans and conflict summaries in the UI to confirm the output matched expectations.
 
-If I had more time, I would test more edge cases like overlapping duration conflicts (not only exact same start time), very large task lists, and cases where available time is very small but tasks have very high priority.
+If I had more time, I would add overlap-based conflict tests, larger task-list stress tests, and more human review of the plan explanations.
 
 ---
 
@@ -199,3 +227,13 @@ If I had another iteration, I would improve conflict handling by checking overla
 
 - What is one important thing you learned about designing systems or working with AI on this project?
 My key takeaway is that AI can support me well, but I still need to use my own judgment and verify everything with tests. I learned that good system design and clear logic make debugging easier, and writing small test cases gives me confidence in my code.
+
+**d. Responsible AI reflection**
+
+My system has clear limitations. It depends on user-provided inputs and rule-based scheduling logic, so it cannot fully understand real-world context (for example, unexpected pet behavior or changing owner needs). It may also reflect bias in task priorities if users consistently prefer one type of pet care over another, because the model optimizes based on the signals it receives.
+
+This AI could be misused if someone treats its output as perfect advice or enters misleading data to generate unrealistic plans. To reduce that risk, I use input validation, conflict checks, transparent plan logic, and human-in-the-loop review before acting on recommendations. The system is designed to assist decisions, not replace human judgment.
+
+What surprised me most during reliability testing was how small logic changes could create unexpected side effects in scheduling order. A minor change in sorting rules could make plans look reasonable but behave differently in edge cases. This reinforced the importance of regression testing and manual review of generated plans.
+
+My collaboration with AI was useful but required active verification. One helpful suggestion was to enforce duplicate-task and same-time conflict checks before adding tasks, which improved data quality and reduced downstream errors. One flawed suggestion was a proposed import structure that referenced the wrong files during UI integration; I rejected it, corrected the imports manually, and confirmed behavior with `pytest` and app testing.

@@ -1,16 +1,61 @@
-# PawPal+ (Module 2 Project)
+# PawPal+: Intelligent Pet Care Planning System
 
-You are building **PawPal+**, a Streamlit app that helps a pet owner plan care tasks for their pet.
+## Overview
 
-## PawPal+
+PawPal+ is a smart scheduling application designed to help pet owners organize and prioritize their daily pet care responsibilities efficiently. The system intelligently plans tasks—including feeding, exercise, medication management, and grooming—by evaluating time constraints and task priorities to create optimized, actionable daily schedules. By providing structured guidance and clear task prioritization, PawPal+ enables pet owners to maintain consistent, high-quality care routines while maximizing time management.
 
-**PawPal+** is an intelligent pet care planning assistant that:
+## Key Features
 
-- **Tracks tasks** — Manage all pet care activities (walks, feeding, medications, enrichment, grooming, and more)
-- **Respects constraints** — Considers available time, task priorities, and owner preferences
-- **Creates smart schedules** — Generates optimized daily plans using intelligent task ranking and consistent prioritization
-- **Explains decisions** — Provides clear reasoning so owners understand why tasks were scheduled the way they are
-- **Simple to use** — Clean interface for entering pet info and managing tasks with minimal friction
+**PawPal+** provides comprehensive pet care planning with:
+
+- **Task Management** — Track all pet care activities (walks, feeding, medications, enrichment, grooming, and more)
+- **Constraint Evaluation** — Considers available time, task priorities, and owner preferences
+- **Optimized Scheduling** — Generates intelligent daily plans using task ranking and consistent prioritization
+- **Transparent Reasoning** — Provides clear explanations for scheduling decisions
+- **User-Friendly Interface** — Simple design for managing pet information and tasks
+
+## Architecture Overview
+
+PawPal+ uses a four-class system architecture: `Task` models individual care activities with time and frequency data, `Pet` manages each pet's profile and task list, `Owner` represents the caregiver and available time constraints, and `Scheduler` coordinates task organization and generates optimized daily plans. The Streamlit UI (`app.py`) provides an interactive frontend that communicates with the backend `pawpal_system.py` module, while `test_pawpal.py` ensures core scheduling logic remains reliable through automated testing.
+
+## Setup Instructions
+
+1. **Create and activate a Python virtual environment** (Python 3.10+):
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate  # Windows
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Run the Streamlit web app**:
+   ```bash
+   streamlit run app.py
+   ```
+   Or run the CLI demo: `python main.py`
+
+## Sample Interactions
+
+**Example 1:** Owner adds a dog named "Buddy" with 4 available hours, then adds daily tasks (30-min walk, 10-min feeding, 15-min medication). The scheduler generates a plan that fits all tasks within the time window.
+
+**Example 2:** Owner has 2 pets (dog and cat) with conflicting priorities—the scheduler prevents duplicate daily tasks for the same pet and orders tasks by duration to optimize the plan.
+
+**Example 3:** Owner marks "afternoon walk" as completed; the system automatically creates the next occurrence based on the task's daily frequency, maintaining a rolling schedule for recurring activities.
+
+## Design Decisions
+
+We separated data models (`Task`, `Pet`, `Owner`) from scheduling logic (`Scheduler`) to keep validation and planning independent, making each class easier to test and maintain. Tasks validate inputs (time > 0, valid time format) at initialization to catch errors early, and the Scheduler uses duration-based sorting with consistent tie-breaking to produce deterministic, explainable plans even when tasks have equal priority.
+
+## Testing Summary
+
+PawPal+ uses pytest to verify core behaviors: task lifecycle management (creation, completion, recurring rollover), multi-pet scheduling without conflicts, and sorting consistency across different time durations. Tests confirmed that task duration validation works correctly, recurring tasks generate proper next-due dates, and the scheduler consistently ranks and orders tasks—revealing areas like edge cases with zero available time that required additional validation logic.
+
+## Reflection
+
+This project taught me that effective scheduling requires thoughtful separation of constraints (time, priority, frequency) and careful edge-case handling—small details like preventing duplicate tasks or handling time conflicts significantly impact system reliability. I learned that building robust AI-like systems isn't just about intelligent ranking; it's about clear validation rules, transparent decision-making, and comprehensive testing to handle the messy real-world scenarios pet owners face.
 
 ## Scenario
 
@@ -34,12 +79,28 @@ Your final app should:
 
 ## Getting started
 
+### Python version
+
+Use Python 3.10 or newer.
+
 ### Setup
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+```
+
+### Run the app
+
+```bash
+streamlit run app.py
+```
+
+### Run the CLI demo
+
+```bash
+python main.py
 ```
 
 ### Suggested workflow
@@ -55,6 +116,12 @@ pip install -r requirements.txt
 ## Smarter Scheduling
 
 PawPal+ now creates more useful daily plans by ranking tasks by priority, fitting tasks within available time, and using consistent tie-breaking when tasks compete. The planner also gives clearer reasoning for task choices so owners can understand and adjust the schedule quickly.
+
+## Short System Diagram
+
+The system diagram has been moved to assets:
+
+- [assets/system_diagram.md](assets/system_diagram.md)
 
 ## Testing PawPal+
 
@@ -76,6 +143,30 @@ pytest test_pawpal.py --cov=. --cov-report=html
 - Edge cases (no time available, conflicting priorities, empty task list)
 
 Write tests incrementally as you implement each scheduling feature.
+
+## Agentic Workflow In VS Code
+
+This repo now includes Copilot customization files so you can use an agentic coding workflow directly in Chat.
+
+- Project-wide guidance: `.github/copilot-instructions.md`
+- Python file rules: `.github/instructions/pawpal-python.instructions.md`
+- Custom coding agent: `.github/agents/pawpal-dev.agent.md`
+- Reusable prompts:
+  - `.github/prompts/pawpal-implement-feature.prompt.md`
+  - `.github/prompts/pawpal-fix-bug.prompt.md`
+
+How to use:
+
+1. Open Copilot Chat in VS Code.
+2. Select the **PawPal Dev** agent from the agent picker.
+3. Ask for tasks like:
+	- "Add recurring monthly medication reminders in planner"
+	- "Fix duplicate-task conflict bug and add tests"
+4. Or type `/` in chat and run:
+	- `Implement PawPal Feature`
+	- `Fix PawPal Bug`
+
+Tip: include acceptance criteria in your prompt so the agent can implement and verify changes in one pass.
 
 ## 📸 Demo
 
