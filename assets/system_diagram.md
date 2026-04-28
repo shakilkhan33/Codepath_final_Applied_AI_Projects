@@ -2,25 +2,26 @@
 
 ```mermaid
 flowchart LR
-    H[Human User] --> UI[Streamlit UI app.py]
-    UI --> M[Owner or Pet or Task Models]
-    M --> S[Scheduler pawpal_system.py]
-    S --> R[Daily Plan plus Assistant Log]
-    R --> UI
-    UI --> H
+    H[Human user] --> UI[Streamlit UI app.py]
+    H --> CLI[CLI demo main.py]
 
-    S --> V[Validation and Conflict Checks]
-    V --> UI
+    UI --> S[pawpal_system.py\nTask, Pet, Owner, Scheduler]
+    CLI --> S
 
-    T[Pytest test_pawpal.py] --> C[Core Scheduling Logic]
-    C --> T
-    H -. manual review and task edits .-> UI
+    S --> V[Validation, conflict checks, recurrence handling]
+    V --> O[Plan, task views, conflict summary, assistant log]
+
+    O --> UI
+    O --> CLI
+
+    T[Pytest test_pawpal.py] --> S
+    T --> V
 ```
 
 At a glance:
-- Main components: UI, model layer, scheduler engine, validator/conflict checker, and tests.
-- Data flow: input -> process -> output follows user/task input -> scheduler -> plan/report shown back to the user.
-- Human and testing checks: user reviews and edits results in UI; pytest verifies scheduling behavior automatically.
+- Main components: UI, CLI, core data models, scheduler engine, validation/conflict checks, and tests.
+- Data flow: input -> processing in pawpal_system.py -> scheduled plan/report/output.
+- This matches the current implementation: there is no database, retrieval layer, agent layer, or evaluator.
 
 ## Project Diagram
 

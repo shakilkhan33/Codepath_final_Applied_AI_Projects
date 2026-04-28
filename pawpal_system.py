@@ -1,11 +1,9 @@
 """Core classes for PawPal scheduling logic."""
-
 from __future__ import annotations
 
 from datetime import date, timedelta
 from dataclasses import dataclass, field
 import re
-
 
 @dataclass
 class Task:

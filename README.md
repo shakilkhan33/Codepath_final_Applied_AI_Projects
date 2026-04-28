@@ -37,6 +37,11 @@ PawPal+ uses a four-class system architecture: `Task` models individual care act
    ```
    Or run the CLI demo: `python main.py`
 
+4. **Run the tests**:
+   ```bash
+   pytest test_pawpal.py -v
+   ```
+
 ## Sample Interactions
 
 **Example 1:** Owner adds a dog named "Buddy" with 4 available hours, then adds daily tasks (30-min walk, 10-min feeding, 15-min medication). The scheduler generates a plan that fits all tasks within the time window.
@@ -117,6 +122,31 @@ python main.py
 
 PawPal+ now creates more useful daily plans by ranking tasks by priority, fitting tasks within available time, and using consistent tie-breaking when tasks compete. The planner also gives clearer reasoning for task choices so owners can understand and adjust the schedule quickly.
 
+## Sample Input/Output
+
+**Sample Input**
+
+An owner enters:
+- Pet name: Buddy
+- Available time: 4 hours
+- Tasks:
+   - 30-minute walk, priority 5
+   - 10-minute feeding, priority 10
+   - 15-minute medication, priority 9
+
+**Sample Output**
+
+The planner returns a schedule that fits the highest-priority tasks first and explains its choices:
+
+```text
+Daily Plan for Buddy
+1. Feeding - 10 minutes
+2. Medication - 15 minutes
+3. Walk - 30 minutes
+
+Reasoning: All three tasks fit within the available time, so the planner ordered them by priority and kept the result easy to follow.
+```
+
 ## Short System Diagram
 
 The system diagram has been moved to assets:
@@ -182,3 +212,7 @@ Use this embed format:
 <a href="final_images/Screenshot%202026-04-01%20005614.png" target="_blank"><img src='final_images/Screenshot%202026-04-01%20005614.png' title='PawPal App 6' width='900' alt='PawPal App 6' class='center-block' /></a>
 <a href="final_images/Screenshot%202026-04-01%20010246.png" target="_blank"><img src='final_images/Screenshot%202026-04-01%20010246.png' title='PawPal App 7' width='900' alt='PawPal App 7' class='center-block' /></a>
 <a href="final_images/Screenshot%202026-04-01%20010913.png" target="_blank"><img src='final_images/Screenshot%202026-04-01%20010913.png' title='PawPal App 8' width='900' alt='PawPal App 8' class='center-block' /></a>
+
+# MY Loom video link below:
+
+https://www.loom.com/share/f059b15d8915443daca8e3540d426100
